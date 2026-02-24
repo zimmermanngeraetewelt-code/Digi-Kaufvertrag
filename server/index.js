@@ -80,10 +80,14 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
+            // Allow Google Fonts stylesheet and inline styles (used by some frameworks)
+            styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+            // More specific directive for style elements (avoids relying on fallback)
+            styleSrcElem: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
             connectSrc: cspConnectArr,
             imgSrc: ["'self'", 'data:'],
-            fontSrc: ["'self'", 'https:', 'data:'],
+            // Allow fonts served by Google (fonts.gstatic.com) and any https font sources
+            fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https:', 'data:'],
             objectSrc: ["'none'"],
         }
     }

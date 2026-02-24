@@ -3,7 +3,8 @@ const { Sequelize } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
-const dbPath = path.resolve(__dirname, 'database.sqlite');
+// Use the project's root database.sqlite so seeded admin matches the app DB
+const dbPath = path.resolve(__dirname, '../database.sqlite');
 console.log('Targeting DB:', dbPath);
 
 const sequelize = new Sequelize({ dialect: 'sqlite', storage: dbPath, logging: false });
