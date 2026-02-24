@@ -4,13 +4,23 @@ require('dotenv').config();
 
 const dbPath = path.resolve(__dirname, '../../database.sqlite');
 
-const sequelize = process.env.DATABASE_URL
-    ? new Sequelize(process.env.DATABASE_URL, { logging: false })
-    : new Sequelize({
+let sequelize;
+if (process.env.DATABASE_URL) {
+    // When using a managed Postgres (e.g., Railway), ensure SSL is accepted.
+    const sequelizeOptions = { logging: false };
+    if (process.env.NODE_ENV === 'production') {
+        sequelizeOptions.dialectOptions = {
+            ssl: { rejectUnauthorized: false }
+        };
+    }
+    sequelize = new Sequelize(process.env.DATABASE_URL, sequelizeOptions);
+} else {
+    sequelize = new Sequelize({
         dialect: 'sqlite',
         storage: dbPath,
         logging: false,
     });
+}
 
 const User = require('./User')(sequelize);
 const Contract = require('./Contract')(sequelize);

@@ -26,9 +26,32 @@ if (process.env.NODE_ENV !== 'production') {
 
 const app = express();
 const server = http.createServer(app);
+// Configure CORS and Socket origins from environment for production safety
+const nodeEnv = process.env.NODE_ENV || 'development';
+const corsOrigin = process.env.CORS_ORIGIN || '*';
+// Support comma-separated origins for CORS
+let corsOptions;
+if (corsOrigin === '*') {
+    corsOptions = { origin: '*' };
+} else if (corsOrigin.includes(',')) {
+    const allowed = corsOrigin.split(',').map(s => s.trim());
+    corsOptions = {
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (allowed.indexOf(origin) !== -1) {
+                return callback(null, true);
+            } else {
+                return callback(new Error('CORS origin denied'), false);
+            }
+        }
+    };
+} else {
+    corsOptions = { origin: corsOrigin };
+}
+
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: corsOrigin,
         methods: ["GET", "POST", "PUT", "DELETE"]
     }
 });
@@ -37,8 +60,40 @@ const io = new Server(server, {
 app.set('io', io);
 
 // Middleware
-app.use(helmet());
-app.use(cors());
+// Configure Helmet with a Content Security Policy that allows
+// websocket / API connections specified by `CSP_CONNECT_SRC` env var.
+// Fallbacks to allowing all `connect-src` if not set to avoid blocking
+// remote connections after deployment (adjust `CSP_CONNECT_SRC` for stricter policy).
+// Determine allowed connect-src for CSP. In production, require an explicit value
+const rawCspConnect = process.env.CSP_CONNECT_SRC;
+// Support comma-separated CSP connect-src entries
+let cspConnectArr = ["'self'"];
+if (rawCspConnect) {
+    const parts = rawCspConnect.split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length) cspConnectArr = cspConnectArr.concat(parts);
+} else if (nodeEnv === 'production') {
+    logger.warn('CSP_CONNECT_SRC is not set in production — falling back to "\'self\'". Set CSP_CONNECT_SRC to your frontend/socket origin.');
+}
+app.use(helmet({
+    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            connectSrc: cspConnectArr,
+            imgSrc: ["'self'", 'data:'],
+            fontSrc: ["'self'", 'https:', 'data:'],
+            objectSrc: ["'none'"],
+        }
+    }
+}));
+
+// Configure CORS middleware to restrict origins in production
+if (nodeEnv === 'production' && corsOrigin === '*') {
+    logger.warn('CORS_ORIGIN is not set in production — allowing all origins. Set CORS_ORIGIN to your frontend origin for safety.');
+}
+app.use(cors({ origin: corsOrigin }));
 app.use(express.json({ limit: '10mb' }));
 
 // Rate limiting

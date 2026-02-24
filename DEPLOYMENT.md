@@ -37,6 +37,9 @@ npm run dev
    CLAUDE_API_KEY=<your Claude API key>
    NODE_ENV=production
    PORT=5000
+   # Set the frontend origin so CORS and CSP allow browser connections
+   CORS_ORIGIN=https://your-frontend-domain.com
+   CSP_CONNECT_SRC=https://your-frontend-domain.com
    ```
 
 4. **After deploy, seed the admin:**
@@ -73,6 +76,10 @@ pm2 startup
 - Keep `.env` file PRIVATE — never commit to GitHub
 - The SQLite database file (`server/database.sqlite`) contains all contract data — back it up regularly
 - For internet deployment: Railway/Render automatically provide HTTPS
+
+### CORS & CSP
+- **CORS_ORIGIN**: Set this to your frontend origin (e.g. `https://app.example.com`) so the backend only accepts browser requests from that origin.
+- **CSP_CONNECT_SRC**: Set this to the frontend/socket origin (include `wss://` for websockets if needed) so the browser permits XHR/WebSocket connections. In production, leaving these unset will cause warnings; do not leave `CSP_CONNECT_SRC` as `*` in production.
 
 ---
 
