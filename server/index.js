@@ -18,6 +18,9 @@ const logger = winston.createLogger({
     ],
 });
 
+// Force build invalidation - v1.0.5
+logger.info('Server starting with updated CSP configuration');
+
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
         format: winston.format.simple(),
