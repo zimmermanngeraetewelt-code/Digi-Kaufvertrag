@@ -59,42 +59,40 @@ const io = new Server(server, {
 // Pass IO to routes
 app.set('io', io);
 
-// Middleware
-// Set permissive CSP headers manually for all responses
+// Middleware - Security Headers (without CSP for now to avoid conflicts)
 app.use((req, res, next) => {
-    // Build CSP header that allows Google Fonts and HTTPS connections
+    // Set all security headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
+    
+    // PERMISSIVE CSP - Allow everything needed
     const cspHeader = 
-        "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
-        "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
-        "connect-src 'self' https: wss: ws: https://fonts.googleapis.com https://fonts.gstatic.com; " +
-        "img-src 'self' data: https: blob:; " +
-        "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com data: https:; " +
-        "object-src 'none'; " +
-        "frame-ancestors 'self'";
+        "default-src *; " +
+        "script-src * 'unsafe-inline' 'unsafe-eval'; " +
+        "style-src * 'unsafe-inline'; " +
+        "font-src * data:; " +
+        "connect-src * wss: ws:; " +
+        "img-src * data: blob:; " +
+        "media-src *; " +
+        "object-src 'none'";
     
     res.setHeader('Content-Security-Policy', cspHeader);
+    logger.info(`CSP Header Set: ${cspHeader.substring(0, 100)}...`);
     next();
 });
 
-// Configure Helmet without CSP (we're handling it manually above)
-app.use(helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-}));
-
-// Configure CORS middleware to restrict origins in production
-if (nodeEnv === 'production' && corsOrigin === '*') {
-    logger.warn('CORS_ORIGIN is not set in production — allowing all origins. Set CORS_ORIGIN to your frontend origin for safety.');
-}
-
-// CORS options with credentials support
+// CORS middleware options with credentials support
 const finalCorsOptions = typeof corsOptions === 'object' && corsOptions.origin ? 
     { ...corsOptions, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] } :
     { origin: corsOrigin, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] };
 
 app.use(cors(finalCorsOptions));
+
+if (nodeEnv === 'production' && corsOrigin === '*') {
+    logger.warn('CORS_ORIGIN is not set in production — allowing all origins. Set CORS_ORIGIN to your frontend origin for safety.');
+}
 app.use(express.json({ limit: '10mb' }));
 
 // Rate limiting
