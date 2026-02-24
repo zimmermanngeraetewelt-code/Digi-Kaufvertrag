@@ -60,45 +60,28 @@ const io = new Server(server, {
 app.set('io', io);
 
 // Middleware
-// Dynamic CSP that includes the current request domain
+// Set permissive CSP headers manually for all responses
 app.use((req, res, next) => {
-    // Extract domain from Host header
-    const host = req.get('host');
-    const protocol = req.protocol || 'https';
-    const currentDomain = `${protocol}://${host}`;
+    // Build CSP header that allows Google Fonts and HTTPS connections
+    const cspHeader = 
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
+        "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
+        "connect-src 'self' https: wss: ws: https://fonts.googleapis.com https://fonts.gstatic.com; " +
+        "img-src 'self' data: https: blob:; " +
+        "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com data: https:; " +
+        "object-src 'none'; " +
+        "frame-ancestors 'self'";
     
-    // Build CSP connect-src with current domain + env variables
-    let cspConnectArr = ["'self'", currentDomain];
-    const rawCspConnect = process.env.CSP_CONNECT_SRC;
-    if (rawCspConnect) {
-        const parts = rawCspConnect.split(',').map(s => s.trim()).filter(Boolean);
-        cspConnectArr = cspConnectArr.concat(parts);
-    }
-    
-    // Store in request for use in helmet middleware
-    req.cspConnect = cspConnectArr;
-    logger.debug(`CSP connect-src: ${JSON.stringify(cspConnectArr)}`);
+    res.setHeader('Content-Security-Policy', cspHeader);
     next();
 });
 
-// Configure Helmet with dynamic CSP
+// Configure Helmet without CSP (we're handling it manually above)
 app.use(helmet({
+    contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
-            // Allow Google Fonts stylesheet and inline styles (used by some frameworks)
-            styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
-            // More specific directive for style elements (avoids relying on fallback)
-            styleSrcElem: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
-            connectSrc: ["'self'", 'https:', 'wss:', 'ws:'],  // Allow all HTTPS connections
-            imgSrc: ["'self'", 'data:', 'https:'],
-            // Allow fonts served by Google (fonts.gstatic.com) and any https font sources
-            fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://fonts.googleapis.com', 'https:', 'data:'],
-            objectSrc: ["'none'"],
-        }
-    }
 }));
 
 // Configure CORS middleware to restrict origins in production
