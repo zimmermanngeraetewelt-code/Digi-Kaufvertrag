@@ -81,13 +81,13 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
             // Allow Google Fonts stylesheet and inline styles (used by some frameworks)
-            styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+            styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
             // More specific directive for style elements (avoids relying on fallback)
-            styleSrcElem: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-            connectSrc: cspConnectArr,
-            imgSrc: ["'self'", 'data:'],
+            styleSrcElem: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
+            connectSrc: [...cspConnectArr, 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
+            imgSrc: ["'self'", 'data:', 'https:'],
             // Allow fonts served by Google (fonts.gstatic.com) and any https font sources
-            fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https:', 'data:'],
+            fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://fonts.googleapis.com', 'https:', 'data:'],
             objectSrc: ["'none'"],
         }
     }
@@ -97,7 +97,13 @@ app.use(helmet({
 if (nodeEnv === 'production' && corsOrigin === '*') {
     logger.warn('CORS_ORIGIN is not set in production — allowing all origins. Set CORS_ORIGIN to your frontend origin for safety.');
 }
-app.use(cors({ origin: corsOrigin }));
+
+// CORS options with credentials support
+const finalCorsOptions = typeof corsOptions === 'object' && corsOptions.origin ? 
+    { ...corsOptions, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] } :
+    { origin: corsOrigin, credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] };
+
+app.use(cors(finalCorsOptions));
 app.use(express.json({ limit: '10mb' }));
 
 // Rate limiting
