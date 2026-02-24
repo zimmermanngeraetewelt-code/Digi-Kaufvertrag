@@ -1,0 +1,21 @@
+{
+    "name": "digi-rechnung-root",
+    "version": "1.0.0",
+    "scripts": {
+        "install-all": "npm install --prefix server && npm install --prefix client",
+        "server": "npm run dev --prefix server",
+        "client": "npm run dev --prefix client",
+        "dev": "concurrently \"npm run server\" \"npm run client\"",
+        "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server",
+        "start": "node server/index.js",
+        "seed": "node server/seed.js"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    },
+    "dependencies": {
+        "date-fns": "^4.1.0",
+        "socket.io": "^4.8.3",
+        "socket.io-client": "^4.8.3"
+    }
+}

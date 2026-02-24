@@ -1,0 +1,11 @@
+1. The "Smart Assistant" Search (Natural Language)
+Instead of clicking through filters and sorting columns on the Dashboard, you talk to your database.
+
+The AI Feature: A chat bar where you type: "Show me all Miele washing machines we sold in the last 3 months that were paid via bank transfer, and calculate the total profit after 19% MwSt."
+Productivity boost: No more complex SQL/NoSQL queries. You get custom business reports just by asking for them.
+
+2.Automated Translation & Localization
+If you expand beyond Köln or deal with international suppliers/contractors.
+
+The AI Feature: Instantly convert your entire quotation/contract into English, Turkish, or Polish with one click, while maintaining the legal professional tone required for German business documents.
+ 

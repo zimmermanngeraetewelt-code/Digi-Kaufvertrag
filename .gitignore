@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+
+# Environment & Secrets — NEVER COMMIT THESE
+.env
+server/.env
+*.env
+
+# Database — contains all business data
+server/database.sqlite
+database.sqlite
+
+# Logs
+*.log
+server/error.log
+server/combined.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

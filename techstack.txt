@@ -1,0 +1,143 @@
+# Technical Stack Document for Digital Kaufvertrag System
+
+## 1. Introduction
+### 1.1 Purpose
+This Technical Stack Document (TSD) details the technology choices for implementing the Digital Kaufvertrag System as outlined in the Product Requirements Document (PRD) and Design Document. The focus is on fulfilling requirements for user authentication, backend data storage, and admin access using exclusively free, open-source tools and technologies. No paid services, proprietary software, or tools with mandatory fees are included. All selected components have free community editions or are inherently open-source without restrictions.
+
+The stack prioritizes:
+- **Security**: Compliance with GDPR and best practices for auth and data handling.
+- **Scalability**: Handle up to 100 concurrent users with free tools.
+- **Maintainability**: Modular, well-documented code.
+- **Cost**: Zero licensing or usage fees; self-hosted where possible.
+
+### 1.2 Key Requirements from PRD
+- **User Authentication**: Secure login (email/password or SSO), role-based access (Admin, Technician, Viewer), 2FA.
+- **Backend Data Storage**: Store contract data (fields, items, signatures), user info, audits; searchable; backups.
+- **Admin Access**: Dashboards for contract oversight, user management, reports; full CRUD (Create, Read, Update, Delete) on data.
+
+### 1.3 Assumptions
+- Development on standard hardware/OS (e.g., Linux/Windows/Mac).
+- Self-hosting on free VPS (e.g., Oracle Cloud Free Tier) or local servers.
+- No external paid APIs; use open-source alternatives.
+- Compliance: Tools support encryption and logging.
+
+### 1.4 Version History
+- Version 1.0: Initial draft (February 17, 2026).
+- Stakeholders: Development Team, Business Owner.
+
+## 2. Overall Architecture
+- **Type**: Full-stack web application (MVC pattern).
+- **Frontend**: Client-side rendering for responsive UI.
+- **Backend**: RESTful API for data handling.
+- **Database**: Relational for structured contract data.
+- **Deployment**: Containerized for portability.
+- **Communication**: HTTPS for security (free certs via Let's Encrypt).
+- **Monitoring**: Basic logging; no paid tools.
+
+## 3. Frontend Stack
+### 3.1 Technologies
+- **Framework**: React.js (v18.x) – Free, open-source library for building interactive UIs.
+- **State Management**: Redux or Context API (built-in to React) – For managing form states and user sessions.
+- **UI Components**: Material-UI (MUI) – Free, open-source component library styled with the provided color palette.
+- **Form Handling**: React Hook Form – Free library for efficient form validation and management.
+- **Routing**: React Router – Free for navigation between screens (e.g., login to dashboard).
+- **PDF Generation**: pdf-lib (JS library) – Free for client-side PDF creation from form data.
+- **e-Signature**: react-signature-canvas – Free canvas-based signature pad.
+
+### 3.2 Fulfillment of Requirements
+- **User Auth Integration**: Handles login forms, token storage in localStorage (securely), and role-based route guards.
+- **Admin Access**: Renders admin dashboards with tables/charts using free Recharts library.
+- **Data Interaction**: Fetches/stores data via API calls (Axios – free HTTP client).
+- **Why Free?**: All are MIT-licensed open-source projects hosted on npm (free package manager).
+
+## 4. Backend Stack
+### 4.1 Technologies
+- **Runtime**: Node.js (v20.x LTS) – Free, open-source JavaScript runtime.
+- **Framework**: Express.js – Free, minimalist web framework for API endpoints.
+- **API Design**: RESTful endpoints (e.g., /api/contracts, /api/users).
+- **Validation**: Joi – Free schema validation for incoming data.
+- **Logging**: Winston – Free logging library for audit trails.
+
+### 4.2 Fulfillment of Requirements
+- **User Authentication**:
+  - **Implementation**: Use bcrypt (free) for password hashing; JWT (jsonwebtoken – free) for token-based auth.
+  - **SSO**: Optional integration with free OAuth providers like GitHub (but limited to email/password for core).
+  - **2FA**: otplib (free OTP library) for time-based one-time passwords.
+  - **Roles**: Middleware checks JWT claims for roles (Admin, Technician, Viewer).
+  - **Endpoints**: POST /login, POST /register, GET /me (protected).
+  - **Security**: Rate limiting with express-rate-limit (free); helmet for headers (free).
+
+- **Backend Data Storage**:
+  - **Implementation**: ORM handles CRUD for contracts/users.
+  - **Searchability**: Full-text search via database queries.
+  - **Backups**: Cron jobs (node-cron – free) for periodic exports to JSON/CSV.
+  - **Audits**: Log changes with timestamps/user IDs.
+  - **Encryption**: Data at-rest via database features; in-transit via HTTPS.
+  - **Scalability**: Cluster mode in Node.js for multi-core support.
+
+- **Admin Access**:
+  - **Implementation**: Protected endpoints (e.g., GET /admin/users, POST /admin/reports).
+  - **Dashboards**: API serves aggregated data (e.g., sales sums via SQL queries).
+  - **User Management**: Admins can CRUD users/roles.
+  - **Reports**: Generate CSV exports server-side with csv-writer (free).
+
+- **Why Free?**: Node.js ecosystem is entirely open-source; no vendor lock-in.
+
+## 5. Database Stack
+### 5.1 Technologies
+- **Database**: PostgreSQL (v15.x) – Free, open-source relational DBMS ideal for structured data like contracts.
+- **ORM**: Sequelize – Free Node.js ORM for PostgreSQL, handling models/migrations.
+- **Schema Management**: Sequelize CLI – For migrations and seeds.
+
+### 5.2 Fulfillment of Requirements
+- **Data Storage**:
+  - **Models**: Users (id, email, password_hash, role), Contracts (id, rechnungs_nr, datum, items JSON/relation, summe, mwst, signatures as text/base64).
+  - **Relations**: One-to-Many (User to Contracts).
+  - **Queries**: Indexes on searchable fields (e.g., rechnungs_nr); auto-calcs in triggers or app logic.
+  - **Storage for PDFs**: Blob fields or file system paths (free); use fs module in Node.js.
+  - **Backups**: pg_dump (built-in free tool) scripted via cron.
+  - **GDPR**: Soft deletes (deleted_at field); data export queries.
+
+- **User Authentication**: Stores user credentials securely; sessions via JWT (no DB storage needed for tokens).
+- **Admin Access**: Admin role gates sensitive queries (e.g., SELECT * FROM users).
+
+- **Why Free?**: PostgreSQL is OSS under PostgreSQL License; no costs for community edition.
+
+## 6. Security and Compliance Stack
+- **Encryption**: crypto (built-in Node.js) for sensitive ops; Let's Encrypt for free SSL certs.
+- **Firewall**: Self-configured via OS tools (e.g., ufw on Linux – free).
+- **Vulnerability Scanning**: npm audit (free) for dependencies.
+- **eIDAS Compliance**: Use qualified signatures via free libs if needed (but basic e-sign via canvas is free).
+- **Fulfillment**: Covers auth security, data encryption, and access controls without paid tools.
+
+## 7. DevOps and Deployment Stack
+- **Version Control**: Git (free) with GitHub (free tier for private repos).
+- **Containerization**: Docker (free community edition) for consistent environments.
+- **CI/CD**: GitHub Actions (free for public/private repos up to limits).
+- **Hosting**: Self-hosted on free VPS (e.g., Oracle Always Free) or local server.
+- **Monitoring**: PM2 (free Node.js process manager) for runtime; basic Prometheus (free) for metrics if scaled.
+- **Testing**: Jest (free) for unit/integration tests.
+- **Fulfillment**: Ensures secure, reliable deployment of auth, storage, and admin features.
+
+## 8. Dependencies and Libraries Summary
+All via npm (free):
+- Auth: bcrypt, jsonwebtoken, otplib.
+- Backend: express, joi, winston, express-rate-limit, helmet.
+- Database: pg (PostgreSQL driver), sequelize.
+- Frontend: react, react-dom, react-router-dom, @mui/material, react-hook-form, pdf-lib, react-signature-canvas, axios, recharts.
+- Other: node-cron, csv-writer.
+
+## 9. Risks and Mitigations
+- **Risk**: Dependency vulnerabilities. **Mitigation**: Regular npm updates; audit scans.
+- **Risk**: Self-hosting downtime. **Mitigation**: Basic redundancy with free tools like rsync for backups.
+- **Risk**: Performance bottlenecks. **Mitigation**: Optimize queries; use free caching like Redis (OSS).
+- **Risk**: Learning curve. **Mitigation**: Extensive free documentation available.
+
+## 10. Implementation Timeline (High-Level)
+- Setup: 1 week (install tools, init projects).
+- Auth Module: 2 weeks.
+- Data Storage/Contracts: 2 weeks.
+- Admin Features: 1 week.
+- Integration/Testing: 2 weeks.
+
+This TSD ensures a robust, free tech stack fulfilling all specified requirements. It can be refined during development.

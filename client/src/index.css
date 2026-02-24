@@ -1,0 +1,69 @@
+:root {
+  font-family: Roboto, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #F2F4F7;
+  color: #000000;
+}
+
+#root {
+  width: 100%;
+}
+
+.sigCanvas {
+  cursor: crosshair;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    background-color: #FFFFFF !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .printable-page {
+    border: none !important;
+    box-shadow: none !important;
+    width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  header,
+  footer,
+  .no-print,
+  nav,
+  button,
+  .MuiAppBar-root,
+  .MuiDrawer-root {
+    display: none !important;
+  }
+}
+
+.print-only {
+  display: none;
+}

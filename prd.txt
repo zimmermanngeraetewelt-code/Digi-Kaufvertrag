@@ -1,0 +1,156 @@
+# Product Requirements Document (PRD) for Digital Kaufvertrag System
+
+## 1. Document Overview
+### 1.1 Purpose
+This PRD outlines the requirements for developing a digital "Kaufvertrag System" (Purchase Contract System) for Gerätewelt, a business specializing in the sale and service of electrical appliances (Elektrogeräte Rhein Haushaltsgeräte & Service). The system will digitize the existing paper-based Kaufvertrag template, enabling efficient creation, management, signing, storage, and sharing of purchase contracts. It aims to streamline operations, reduce paperwork, ensure compliance with German legal standards (e.g., BGB for contracts, UStG for VAT), and improve customer experience.
+
+### 1.2 Scope
+- **In Scope**: Digital form creation with exact fields from the provided template; user authentication; contract generation (PDF/export); basic workflows for sales staff/technicians; data storage; digital signatures.
+- **Out of Scope**: Advanced CRM integration; inventory management (beyond availability checks); payment processing (e.g., gateway integration); multi-language support beyond German; mobile app (focus on web-based for now, with responsive design).
+
+### 1.3 Version History
+- Version 1.0: Initial draft based on template analysis (February 17, 2026).
+- Stakeholders: Business Owner (e.g., Nikolaus Str. 50, Cologne); Development Team; Legal Advisor.
+
+### 1.4 Assumptions
+- Users have basic digital literacy (e.g., sales staff, technicians, customers).
+- System will comply with EU GDPR for data handling.
+- Hosting on a secure cloud platform (e.g., AWS or Azure in EU region).
+- No physical hardware integration (e.g., scanners) required initially.
+
+## 2. Business Goals and Objectives
+### 2.1 Goals
+- Digitize contract creation to reduce time from 10-15 minutes (manual) to under 5 minutes.
+- Minimize errors in fields like calculations (e.g., Summe, MwSt., Rechnungsbetrag).
+- Enable remote signing and sharing to support fieldwork (e.g., technicians on-site).
+- Improve record-keeping for audits, with searchable archives.
+- Enhance customer satisfaction through professional, branded digital documents.
+
+### 2.2 Key Performance Indicators (KPIs)
+- Adoption Rate: 80% of contracts digitized within 3 months.
+- Error Reduction: <5% calculation errors post-launch.
+- User Satisfaction: NPS >7/10 from internal users.
+- Compliance: 100% adherence to VAT (19%) and contract laws.
+
+## 3. User Personas
+### 3.1 Primary Users
+- **Sales Technician (Techniker)**: Age 25-50, tech-savvy, creates contracts on-site or in-store. Needs quick input, auto-calculations, and signature capture.
+- **Business Owner/Admin**: Oversees operations, views reports, manages user access. Needs dashboards for contract history and analytics.
+- **Customer (Kunde)**: End-user signing the contract. May be non-technical; requires simple interface for review and e-signature.
+
+### 3.2 Secondary Users
+- **Accountant**: Exports data for bookkeeping (e.g., VAT reports).
+- **Legal Team**: Reviews templates for compliance updates.
+
+## 4. Functional Requirements
+### 4.1 Core Features
+#### 4.1.1 User Authentication and Access Control
+- Secure login via email/password or SSO (e.g., Google Workspace).
+- Roles: Admin (full access), Technician (create/edit), Viewer (read-only).
+- Password recovery and 2FA for security.
+
+#### 4.1.2 Contract Creation Form
+- Mirror the exact fields from the template:
+  - **Header/Company Info**: Pre-filled (Gerätewelt - Nikolaus Str. 50, 51149 Köln; Telefon: 0172/754 536 7, 02203/190 89 720; E-mail: geraetewelt@hotmail.com).
+  - **Rechnungs-Nr.**: Auto-generated unique ID (e.g., sequential or UUID).
+  - **Techniker**: Dropdown/select from user list or free text.
+  - **Datum**: Date picker (default: current date).
+  - **Termin**: Date picker for appointment.
+  - **Uhrzeit**: Time picker.
+  - **Gerätetyp**: Free text or dropdown (e.g., Kühlschrank, Waschmaschine).
+  - **Item Table**: Dynamic rows for:
+    - Pos (Position): Auto-increment.
+    - Stück (Quantity): Numeric input.
+    - Beschreibung (Description): Text area.
+    - Preis (Price): Numeric input (EUR).
+    - Verfügbarkeit (Availability): Dropdown (e.g., Sofort verfügbar, Auf Bestellung).
+  - **Summe**: Auto-calculated sum of (Stück * Preis) across rows.
+  - **Zahlungsweise**: Radio buttons: Zahlung in bar, Scheck, Überweisung.
+  - **19% MwSt.**: Auto-calculated (19% of Summe).
+  - **Rechnungsbetrag**: Auto-calculated (Summe + MwSt.).
+  - **Signatures**: Digital fields for:
+    - Datum, Unterschrift Techniker: e-Signature pad or typed.
+    - Unterschrift Kunde: e-Signature pad or typed.
+  - **Footer**: Pre-filled bank details (Umsatzsteuer ID: DE36 820 90 11 500 TSW; Vertreten durch Frau Ebru Karal; Bankverbindung: Postbank, IBAN: DE61 3707 0209 0044 100 00, BIC: DEUTDEDKP08, Ebru Karababa).
+
+- Validation: Required fields marked; real-time checks (e.g., numeric for prices, valid dates).
+- Auto-save drafts to prevent data loss.
+
+#### 4.1.3 Contract Management
+- Search/filter contracts by Rechnungs-Nr., Datum, Techniker, or Customer name (add optional Customer fields: Name, Address).
+- Edit drafts; lock finalized contracts.
+- Generate PDF with branding (logo, colors from template).
+- Export to CSV/Excel for reporting (e.g., total sales, VAT summary).
+
+#### 4.1.4 Workflow and Notifications
+- Status: Draft, Pending Signature, Signed, Archived.
+- Notifications: In-app status updates for the dashboard.
+
+#### 4.1.5 Reporting
+- Dashboard: Overview of contracts (e.g., monthly sales, top items).
+- Exportable reports: VAT totals, invoice summaries.
+
+### 4.2 Use Cases
+- **UC-01: Create New Contract**
+  - Technician logs in, selects "New Kaufvertrag", fills fields, adds items, signs, sends to customer.
+- **UC-02: Customer Signs Remotely**
+  - Customer reviews contract and e-signs via QR code/link on technician's tablet or phone.
+- **UC-03: Admin Reviews**
+  - Searches contracts, exports data for accounting.
+
+## 5. Non-Functional Requirements
+### 5.1 Performance
+- Load time: <2 seconds for form.
+- Handle 100 concurrent users (scalable).
+- Response time: Real-time calculations.
+
+### 5.2 Security
+- Data encryption (HTTPS, at-rest).
+- GDPR compliance: Consent for customer data; data deletion options.
+- Audit logs for changes.
+- e-Signatures compliant with eIDAS (EU electronic signature regulation).
+
+### 5.3 Usability
+- Responsive design: Mobile-friendly for on-site use.
+- Language: German (default); intuitive UI with tooltips.
+- Accessibility: WCAG 2.1 compliant (e.g., screen reader support).
+
+### 5.4 Reliability
+- Uptime: 99.9%.
+- Backup: Daily data backups.
+- Error Handling: User-friendly messages (e.g., "Invalid price format").
+
+### 5.5 Technical
+- Platform: Web app (e.g., React frontend, Node.js/Express backend).
+- Database: SQL (e.g., PostgreSQL) for structured data.
+- Storage: Cloud for PDFs (e.g., S3).
+- APIs: For e-sign (e.g., DocuSign integration if needed).
+
+## 6. UI/UX Considerations
+- Layout: Mimic template structure for familiarity (header, fields, table, footer).
+- Flow: Step-by-step wizard (e.g., Step 1: Header, Step 2: Items, Step 3: Payment/Sign).
+- Visuals: Incorporate logo (fridge icon) and maroon color scheme.
+- Prototyping: Use Figma for wireframes before development.
+
+## 7. Dependencies and Integrations
+- External: PDF generation library (e.g., pdf-lib).
+- Internal: User database synced with business contacts.
+- Legal: Review by lawyer for contract validity.
+
+## 8. Risks and Mitigations
+- **Risk**: Data privacy breach. **Mitigation**: Implement strict access controls and regular audits.
+- **Risk**: Calculation errors. **Mitigation**: Unit tests for auto-calcs.
+- **Risk**: Low adoption. **Mitigation**: Training sessions for staff.
+- **Risk**: Legal non-compliance. **Mitigation**: Consult German contract law expert during design.
+
+## 9. Timeline and Milestones (High-Level)
+- Phase 1: Requirements & Design (2 weeks).
+- Phase 2: Development & Testing (4-6 weeks).
+- Phase 3: Launch & Training (1 week).
+- Total: 7-9 weeks for MVP.
+
+## 10. Appendices
+- **Template Reference**: Based on provided image; ensure all fields are captured accurately.
+- **Future Enhancements**: Inventory sync, multi-currency, AI auto-fill suggestions.
+
+This PRD serves as a blueprint for development. It can be iterated based on feedback.

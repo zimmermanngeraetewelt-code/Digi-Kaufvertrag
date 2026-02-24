@@ -1,0 +1,179 @@
+# Design Document for Digital Kaufvertrag System
+
+## 1. Introduction
+### 1.1 Purpose
+This Design Document outlines the visual and interaction design for the Digital Kaufvertrag System, a web-based application for creating, managing, and signing purchase contracts (Kaufverträge) for Gerätewelt. It builds on the Product Requirements Document (PRD) and focuses on delivering a user-friendly, professional interface that aligns with the business's branding while incorporating the specified color palette. The design emphasizes simplicity for on-site use by technicians, clarity for customers, and efficiency for admins.
+
+The system will be a responsive web app, prioritizing mobile-first design for fieldwork. All designs follow German usability standards (e.g., DIN EN ISO 9241 for ergonomics) and ensure compliance with accessibility guidelines.
+
+### 1.2 Scope
+- **In Scope**: UI layouts, color schemes, typography, components, wireframes (textual descriptions), user flows, responsiveness, and accessibility.
+- **Out of Scope**: Detailed pixel-perfect mockups (to be created in tools like Figma post-this doc); animation specs; performance optimizations (covered in tech specs).
+
+### 1.3 Design Goals
+- **Intuitive**: Mirror the paper template's structure to reduce learning curve.
+- **Branded**: Integrate Gerätewelt's logo (fridge icon) and adapt the attached color palette to evoke reliability and modernity in appliance sales.
+- **Efficient**: Quick form completion with minimal clicks.
+- **Inclusive**: Accessible to all users, including those with disabilities.
+- **Consistent**: Uniform styles across screens.
+
+### 1.4 Version History
+- Version 1.0: Initial draft (February 17, 2026).
+- Stakeholders: UI/UX Designer, Development Team, Business Owner.
+
+## 2. Design Principles
+- **Simplicity**: Clean layouts with ample white space to avoid clutter on mobile devices.
+- **Consistency**: Reusable components (e.g., buttons, inputs) across the app.
+- **Hierarchy**: Use color and size to guide focus (e.g., bold headers, accented CTAs).
+- **Feedback**: Real-time validation and loading indicators.
+- **Mobile-First**: Designs start from smallest screens, scaling up.
+- **Cultural Fit**: German-language UI with logical flow (left-to-right, top-to-bottom).
+
+## 3. Color Palette
+The design strictly adheres to the provided color palette, adapted for Gerätewelt's appliance service theme. Maroon/red tones evoke energy and trust, while neutrals ensure readability. Usage guidelines ensure high contrast (WCAG AA compliant, e.g., text on backgrounds ≥4.5:1 ratio).
+
+### 3.1 Brand Colors
+Used for interactive elements to "bring the brand into the site."
+- Primary Accent: #FC2B1A (Vibrant Red) – Buttons, icons, error highlights.
+- Secondary Accent: #FFD2AE (Light Peach) – Hover states, subtle highlights, badges (e.g., "Draft" status).
+
+### 3.2 Core Colors
+Define contrast for text and backgrounds.
+- Primary: #BF0010 (Deep Red) – Headers, primary navigation, key text (e.g., totals like Summe).
+- Secondary: #B2343D (Maroon) – Subheaders, borders, secondary buttons.
+- Light: #F2F4F7 (Light Gray) – Backgrounds, cards, form fields.
+- Lightest: #FFFFFF (White) – Text on dark backgrounds, default page background.
+
+### 3.3 Extended Palette (Derived for Accessibility)
+- Success: #28A745 (Green, not in palette – use sparingly; contrast-tested).
+- Warning: #FFC107 (Yellow).
+- Error: #FC2B1A (from brand).
+- Disabled: Grayed versions (e.g., #B2343D at 50% opacity).
+- Text: Dark (#BF0010 or black #000000) on light backgrounds; white on dark.
+
+### 3.4 Usage Rules
+- Backgrounds: Primarily #F2F4F7 or #FFFFFF for readability.
+- Accents: Limit #FC2B1A to CTAs to avoid overwhelming.
+- Dark Mode: Optional future enhancement; invert to dark grays with light accents.
+
+## 4. Typography
+Use system fonts for performance; fallback to web-safe options.
+- **Font Family**: Primary: Roboto (sans-serif, modern and readable); Fallback: Arial, Helvetica.
+- **Sizes**:
+  - Headers (H1): 24px, Bold, #BF0010.
+  - Subheaders (H2): 18px, Medium, #B2343D.
+  - Body Text: 16px, Regular, #000000.
+  - Labels/Inputs: 14px, Regular.
+  - Small Text (e.g., footnotes): 12px.
+- **Line Height**: 1.5 for body; 1.2 for headers.
+- **Weight**: Bold (700) for emphasis; Medium (500) for subtext; Regular (400) default.
+- **Alignment**: Left-aligned for forms; center for titles.
+- **Language**: German; support for umlauts (Ä, Ö, Ü).
+
+## 5. Icons and Imagery
+- **Icons**: Use Material Icons (free, scalable) in #FC2B1A for actions (e.g., add item: plus-circle; delete: trash).
+- **Logo**: Gerätewelt logo (fridge icon) in header, sized 40x40px, colored #BF0010.
+- **Imagery**: Minimal; use placeholders for appliance images if integrated later (e.g., from inventory). No stock photos unless relevant.
+- **Styles**: Icons at 24px; rounded corners (4px) for consistency.
+
+## 6. UI Components
+Reusable elements styled with the palette.
+
+### 6.1 Buttons
+- Primary: #FC2B1A background, #FFFFFF text, 8px padding, 4px border-radius. Hover: #BF0010.
+- Secondary: #B2343D border (2px), #B2343D text, transparent background. Hover: #B2343D background, #FFFFFF text.
+- Disabled: Gray (#F2F4F7 background, 50% opacity).
+- Sizes: Standard (full-width on mobile); Small (icon-only).
+
+### 6.2 Form Inputs
+- Text/Date/Time: #FFFFFF background, #B2343D border (1px), #000000 text. Focus: #FC2B1A border.
+- Dropdowns: Same as inputs; arrow icon in #B2343D.
+- Radio/Checkboxes: #FC2B1A accent color.
+- Table: Borders in #F2F4F7, headers in #BF0010, rows alternate #FFFFFF/#F2F4F7.
+- Validation: Green check for success; #FC2B1A error text/icon.
+
+### 6.3 Cards and Modals
+- Cards: #FFFFFF background, #F2F4F7 subtle shadow (2px), 8px radius.
+- Modals: Overlay #000000 at 50% opacity; content card centered.
+
+### 6.4 Navigation
+- Top Bar: #BF0010 background, #FFFFFF text/logo. Items: Dashboard, New Contract, Search.
+- Sidebar (Desktop): #F2F4F7 background, #B2343D links.
+
+### 6.5 Other
+- Loaders: Spinner in #FC2B1A.
+- Tooltips: #B2343D background, #FFFFFF text, arrow pointer.
+
+## 7. Screen Designs/Wireframes
+Textual descriptions; visualize in Figma.
+
+### 7.1 Login Screen
+- Layout: Centered card on #F2F4F7 background.
+- Elements: Logo top, Email/Password inputs, Primary Button ("Anmelden"), Forgot Password link (#B2343D).
+- Mobile: Full-screen card.
+
+### 7.2 Dashboard/Home
+- Layout: Header bar (#BF0010), search bar, card grid for recent contracts.
+- Elements: Metrics (e.g., "5 Pending" badge in #FFD2AE), table of contracts with filters.
+- Wireframe (ASCII):
+```
+[Header: Logo | Search | User Icon]
+[Metrics Cards: Total Contracts | Sales This Month]
+[Table: Rechnungs-Nr. | Datum | Status | Actions]
+```
+
+### 7.3 New Contract Form
+- Layout: Stepper wizard (Header, Items, Payment/Sign) on #FFFFFF.
+- Elements: Pre-filled header, dynamic table (add row button #FC2B1A), auto-calc fields in #BF0010 bold.
+- Wireframe:
+```
+[Step 1: Header Fields (Rechnungs-Nr. auto, Datum picker)]
+[Item Table: Pos | Stück | Beschreibung | Preis | Verfügbarkeit]
+[+ Add Row Button]
+[Summe: Bold #BF0010]
+[Next Button #FC2B1A]
+```
+
+### 7.4 Contract View/Sign
+- Layout: PDF-like preview, signature pads.
+- Elements: Scrollable form view, e-sign fields (draw/type), Submit button.
+- Customer View: Simplified, read-only with sign button.
+
+### 7.5 Admin Reports
+- Layout: Charts (use #FC2B1A/#B2343D for bars), export button.
+- Elements: Filters (date range), table exports.
+
+## 8. User Flows
+### 8.1 Create Contract Flow
+1. Login → Dashboard → New Contract.
+2. Fill Header → Add Items (loop) → Select Payment → Sign → Send to Customer.
+3. Customer: Email Link → Review → Sign → Confirmation.
+
+### 8.2 Search/Edit Flow
+1. Dashboard → Search (filters) → Select Contract → Edit (if draft) → Save.
+
+Visual Flow: Use arrows in diagrams (e.g., in Figma: Login > Home > Form Step 1 > ... > Success).
+
+## 9. Responsiveness
+- Breakpoints: Mobile (<768px): Stacked forms, full-width buttons.
+- Tablet (768-1024px): Two-column layouts.
+- Desktop (>1024px): Sidebar nav, wider tables.
+- Testing: Ensure no horizontal scroll; touch-friendly taps (44x44px min).
+
+## 10. Accessibility
+- WCAG 2.1 AA: Alt text for icons/images, keyboard navigation, screen reader labels (e.g., aria-label for fields).
+- Contrast: All text meets ratios.
+- Focus: #FC2B1A outline on focus.
+- ARIA: Roles for dynamic content (e.g., live regions for calculations).
+
+## 11. Branding Integration
+- Header: Always include Gerätewelt logo and contact (footer on PDFs).
+- PDFs: Export with maroon (#B2343D) header wave, as in original template.
+- Customizations: Allow admin to tweak accents if needed.
+
+## 12. Next Steps
+- Create high-fidelity mockups in Figma.
+- User Testing: Prototype with 5 technicians.
+- Iteration: Based on feedback, refine colors/components.
+
+This document provides a foundation for implementation.
