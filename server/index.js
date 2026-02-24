@@ -60,20 +60,28 @@ const io = new Server(server, {
 app.set('io', io);
 
 // Middleware
-// Configure Helmet with a Content Security Policy that allows
-// websocket / API connections specified by `CSP_CONNECT_SRC` env var.
-// Fallbacks to allowing all `connect-src` if not set to avoid blocking
-// remote connections after deployment (adjust `CSP_CONNECT_SRC` for stricter policy).
-// Determine allowed connect-src for CSP. In production, require an explicit value
-const rawCspConnect = process.env.CSP_CONNECT_SRC;
-// Support comma-separated CSP connect-src entries
-let cspConnectArr = ["'self'"];
-if (rawCspConnect) {
-    const parts = rawCspConnect.split(',').map(s => s.trim()).filter(Boolean);
-    if (parts.length) cspConnectArr = cspConnectArr.concat(parts);
-} else if (nodeEnv === 'production') {
-    logger.warn('CSP_CONNECT_SRC is not set in production — falling back to "\'self\'". Set CSP_CONNECT_SRC to your frontend/socket origin.');
-}
+// Dynamic CSP that includes the current request domain
+app.use((req, res, next) => {
+    // Extract domain from Host header
+    const host = req.get('host');
+    const protocol = req.protocol || 'https';
+    const currentDomain = `${protocol}://${host}`;
+    
+    // Build CSP connect-src with current domain + env variables
+    let cspConnectArr = ["'self'", currentDomain];
+    const rawCspConnect = process.env.CSP_CONNECT_SRC;
+    if (rawCspConnect) {
+        const parts = rawCspConnect.split(',').map(s => s.trim()).filter(Boolean);
+        cspConnectArr = cspConnectArr.concat(parts);
+    }
+    
+    // Store in request for use in helmet middleware
+    req.cspConnect = cspConnectArr;
+    logger.debug(`CSP connect-src: ${JSON.stringify(cspConnectArr)}`);
+    next();
+});
+
+// Configure Helmet with dynamic CSP
 app.use(helmet({
     crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: {
@@ -84,7 +92,7 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
             // More specific directive for style elements (avoids relying on fallback)
             styleSrcElem: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
-            connectSrc: [...cspConnectArr, 'https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
+            connectSrc: ["'self'", 'https:', 'wss:', 'ws:'],  // Allow all HTTPS connections
             imgSrc: ["'self'", 'data:', 'https:'],
             // Allow fonts served by Google (fonts.gstatic.com) and any https font sources
             fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://fonts.googleapis.com', 'https:', 'data:'],
